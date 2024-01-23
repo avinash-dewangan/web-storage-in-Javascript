@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div>
+      <h1>Todo List Item</h1>
+
+      <h2 id="toggleText">Add Item</h2>
+      <form>
+        <input class="hidden" type="text" id="id" value="" />
+        <label for="">Item Name</label>
+        <input type="text" id="name" />
+        <button onclick="submitForm()">Submit</button>
+      </form>
+
+      <h2>List of items</h2>
+      <div id="main"></div>
+    </div>
+
+    <script>
+      function setEditItemInForm(id, item) {
+        document.getElementById("id").value = id;
+        document.getElementById("name").value = item;
+        document.getElementById("toggleText").innerText = "Update Item";
+      }
+
+      function submitForm() {
+        if (document.getElementById("id").value === "") {
+          addItems();
+        } else {
+          updateItems();
+        }
+      }
+      async function getItems() {
+        let res = await fetch("http://localhost:3000/items");
+
+        if (!res.ok) {
+          // return throw("error")
+          return;
+        }
+        let data = await res.json();
+        console.log(data);
+        let htmldata = data
+          .map((item) => {
+            return `
+               <tr>
+      <th scope="row">${item.id}</th>
+      <td>${item.name}</td>
+      <td><button type="button" class="btn btn-warning" onclick="setEditItemInForm(${item.id},'${item.name}')">EditItem</button>
+      <td><button type="button" class="btn btn-danger" onclick="deleteItem(${item.id})">Delete Item</button></td></td>
+    </tr>`;
+          })
+          .join("");
+        let table = `<table class="table">
+                        <thead>
+                            <tr>
+                            <th scope="col">id</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Edit</th>
+                            <th scope="col">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        ${htmldata}
+                        </tbody>
+                        </table>`;
+        document.getElementById("main").innerHTML = table;
+      }
+
+      getItems();
+      async function deleteItem(id) {
+        let res = await fetch("http://localhost:3000/items/" + id, {
+          method: "Delete",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        });
+        let data = await res.json();
+        getItems();
+      }
+
+      async function addItems() {
+        const newItems = {
+          name: document.getElementById("name").value,
+        };
+
+        let res = await fetch("http://localhost:3000/items", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newItems),
+        });
+        let data = await res.json();
+        getItems();
+      }
+
+      async function updateItems() {
+        let id = document.getElementById("id").value;
+        const updateItems = {
+          name: document.getElementById("name").value,
+        };
+
+        let res = await fetch("http://localhost:3000/items/" + id, {
+          method: "PUT",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updateItems),
+        });
+        let data = await res.json();
+        getItems();
+      }
+
+      async function addItems() {
+        const newItems = {
+          name: document.getElementById("name").value,
+        };
+
+        let res = await fetch("http://localhost:3000/items", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newItems),
+        });
+        let data = await res.json();
+        getItems();
+      }
+    </script>
+  </body>
+</html>

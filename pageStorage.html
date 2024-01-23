@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <h1>Todo List Item</h1>
+
+        <h2 id="toggleText">Add Item</h2>
+        <form id="myForm">
+            <input class="hidden" type="text" id="id" value="" />
+            <label for="">Item Name</label>
+            <input type="text" id="name" />
+            <button id="btnToggle" onclick="submitForm(event)" disabled>Submit</button>
+        </form>
+
+        <h2>List of items</h2>
+        <div id="main"></div>
+    </div>
+
+    <script>
+        // // In-memory database
+        let data = [
+            // { id: 1, name: 'Item 1' },
+            // { id: 2, name: 'Item 2' },
+            // { id: 3, name: 'Item 3' }
+        ];
+        let btnToggle = document.getElementById("btnToggle")
+        btnToggle.disabled=true
+        document.getElementById("name").addEventListener("keyup", event=>{
+            (event.target.value).trim()!==''?btnToggle.disabled=false:btnToggle.disabled=true 
+        })
+
+        function setEditItemInForm(id, item) {
+            document.getElementById("id").value = id;
+            document.getElementById("name").value = item;
+            document.getElementById("toggleText").innerText = "Update Item";
+        }
+
+        function submitForm(event) {
+            event.preventDefault()
+            if (document.getElementById("id").value === "") {
+                addItems();
+            } else {
+                updateItems();
+            }
+            document.getElementById("myForm").reset()
+            btnToggle.disabled=true
+        }
+        async function addItems() {
+            const newItem = {
+                name: document.getElementById("name").value,
+            };
+           
+            
+            newItem.id = data.length + 1;
+            data.push(newItem);
+    
+            getItems();
+            
+        }
+        async function getItems() {
+            // if(!data.length<0){
+            //     return 
+            // }
+         
+            let htmldata = data
+                .map((item) => {
+                    return `
+                   <tr>
+          <th scope="row">${item.id}</th>
+          <td>${item.name}</td>
+          <td><button type="button" class="btn btn-warning" onclick="setEditItemInForm(${item.id},'${item.name}')">EditItem</button>
+          <td><button type="button" class="btn btn-danger" onclick="deleteItem(${item.id})">Delete Item</button></td></td>
+        </tr>`;
+                })
+                .join("");
+            let table = `<table class="table">
+                            <thead>
+                                <tr>
+                                <th scope="col">id</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Edit</th>
+                                <th scope="col">Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            ${htmldata}
+                            </tbody>
+                            </table>`;
+            document.getElementById("main").innerHTML = table;
+        }
+
+        getItems();
+        async function deleteItem(id) {
+          
+            const index = data.findIndex(item => item.id === id);
+
+            if (index !== -1) {
+                const deletedItem = data.splice(index, 1);
+               
+                getItems();
+            }
+        }
+
+
+        async function updateItems() {
+           
+            let id = document.getElementById("id").value;
+            const updateItem = {
+                name: document.getElementById("name").value,
+            };
+
+            const index = data.findIndex(item => item.id === parseInt(id));
+
+            if (index !== -1) {
+                data[index] = { ...data[index], ...updateItem };
+                localStorage.setItem("data",JSON.stringify(data))
+                document.getElementById("toggleText").innerText = "Add Item";
+                getItems();
+            }
+        }
+    </script>
+</body>
+
+</html>

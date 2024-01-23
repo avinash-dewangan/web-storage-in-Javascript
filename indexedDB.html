@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IndexedDB Example</title>
+</head>
+<body>
+    <h1>IndexedDB Example</h1>
+
+    <button onclick="addData()">Add Data</button>
+    <button onclick="readData()">Read Data</button>
+
+    <script>
+        // Open a database or create one if it doesn't exist
+        const request = window.indexedDB.open('MyDatabase', 1);
+
+        let db;
+
+        // Create or upgrade database
+        request.onupgradeneeded = (event) => {
+            db = event.target.result;
+
+            // Create an object store (like a table in SQL) with an auto-incrementing key
+            const objectStore = db.createObjectStore('MyObjectStore', { keyPath: 'id', autoIncrement: true });
+
+            // Create an index for searching by name
+            objectStore.createIndex('name', 'name', { unique: false });
+        };
+
+        // Handle successful database open
+        request.onsuccess = (event) => {
+            db = event.target.result;
+        };
+
+        // Handle errors
+        request.onerror = (event) => {
+            console.error('Error opening database:', event.target.error);
+        };
+
+        // Add data to the database
+        function addData() {
+            const transaction = db.transaction(['MyObjectStore'], 'readwrite');
+            const objectStore = transaction.objectStore('MyObjectStore');
+
+            // Add data to the object store
+            const data = { name: 'John Doe', age: 30 };
+            const request = objectStore.add(data);
+
+            // Handle success or error
+            request.onsuccess = () => {
+                console.log('Data added successfully');
+            };
+
+            request.onerror = (event) => {
+                console.error('Error adding data:', event.target.error);
+            };
+        }
+
+        // Read data from the database
+        function readData() {
+            const transaction = db.transaction(['MyObjectStore'], 'readonly');
+            const objectStore = transaction.objectStore('MyObjectStore');
+
+            // Open a cursor to iterate over the data
+            const request = objectStore.openCursor();
+
+            // Handle cursor success or error
+            request.onsuccess = (event) => {
+                const cursor = event.target.result;
+
+                if (cursor) {
+                    console.log('Name:', cursor.value.name, 'Age:', cursor.value.age);
+                    cursor.continue();
+                } else {
+                    console.log('No more data');
+                }
+            };
+
+            request.onerror = (event) => {
+                console.error('Error reading data:', event.target.error);
+            };
+        }
+    </script>
+</body>
+</html>

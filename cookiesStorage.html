@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD Operations with Cookies</title>
+</head>
+<body>
+    <h1>CRUD Operations with Cookies</h1>
+
+    <form id="cookieForm">
+        <label for="key">Key:</label>
+        <input type="text" id="key" name="key" required>
+        <br>
+
+        <label for="value">Value:</label>
+        <input type="text" id="value" name="value" required>
+        <br>
+
+        <button type="button" onclick="createCookie()">Create</button>
+        <button type="button" onclick="readCookie()">Read</button>
+        <button type="button" onclick="updateCookie()">Update</button>
+        <button type="button" onclick="deleteCookie()">Delete</button>
+        <button type="button" onclick="listAllCookies()">listAllCookies</button>
+    </form>
+
+    <div id="result"></div>
+
+    <ul id="cookieList"></ul>
+    <script>
+        function createCookie() {
+            const key = document.getElementById('key').value;
+            const value = document.getElementById('value').value;
+
+            document.cookie = `${key}=${value}; expires=Thu, 01 Jan 2030 00:00:00 UTC; path=/`;
+
+            displayResult(`Cookie created: ${key}=${value}`);
+        }
+
+        function listAllCookies() {
+            const cookies = document.cookie.split(';');
+
+            const cookieListElement = document.getElementById('cookieList');
+            cookieListElement.innerHTML = '';
+
+            if (cookies.length > 0) {
+                cookies.forEach(cookie => {
+                    const [cookieKey, cookieValue] = cookie.trim().split('=');
+
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${cookieKey}: ${cookieValue}`;
+                    cookieListElement.appendChild(listItem);
+                });
+            } else {
+                const listItem = document.createElement('li');
+                listItem.textContent = 'No cookies found';
+                cookieListElement.appendChild(listItem);
+            }
+        }
+        function readCookie() {
+            const key = document.getElementById('key').value;
+            const cookies = document.cookie.split(';');
+
+            for (const cookie of cookies) {
+                const [cookieKey, cookieValue] = cookie.trim().split('=');
+
+                if (cookieKey === key) {
+                    displayResult(`Cookie found: ${cookieKey}=${cookieValue}`);
+                    return;
+                }
+            }
+
+            displayResult('Cookie not found');
+        }
+
+
+        function updateCookie() {
+            const key = document.getElementById('key').value;
+            const value = document.getElementById('value').value;
+
+            if (document.cookie.includes(key)) {
+                document.cookie = `${key}=${value}; expires=Thu, 01 Jan 2030 00:00:00 UTC; path=/`;
+                displayResult(`Cookie updated: ${key}=${value}`);
+            } else {
+                displayResult('Cookie not found');
+            }
+        }
+
+        function deleteCookie() {
+            const key = document.getElementById('key').value;
+
+            if (document.cookie.includes(key)) {
+                document.cookie = `${key}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/`;
+                displayResult(`Cookie deleted: ${key}`);
+            } else {
+                displayResult('Cookie not found');
+            }
+        }
+
+        function displayResult(message) {
+            document.getElementById('result').textContent = message;
+        }
+    </script>
+</body>
+</html>
