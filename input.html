@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Input Types Example</title>
+</head>
+<body>
+
+    <h2>All Input Types Example</h2>
+
+    <form id="myForm">
+        <label for="text">Text:</label>
+        <input type="text" id="text" name="text" required><br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br>
+
+        <label for="number">Number:</label>
+        <input type="number" id="number" name="number" min="18" required><br>
+
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required><br>
+
+        <label for="color">Color:</label>
+        <input type="color" id="color" name="color"><br>
+
+        <label for="datetime-local">Datetime Local:</label>
+        <input type="datetime-local" id="datetime-local" name="datetime-local"><br>
+
+    
+
+
+        <label for="month">Month:</label>
+        <input type="month" id="month" name="month"><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password"><br>
+
+        <label for="radio">Radio:</label>
+        <input type="radio" id="radio" name="radio" value="radio-value"><br>
+
+        <label for="range">Range:</label>
+        <input type="range" id="range" name="range"><br>
+
+        <label for="search">Search:</label>
+        <input type="search" id="search" name="search"><br>
+
+        <label for="tel">Tel:</label>
+        <input type="tel" id="tel" name="tel"><br>
+
+        <label for="time">Time:</label>
+        <input type="time" id="time" name="time"><br>
+
+        <label for="url">URL:</label>
+        <input type="url" id="url" name="url"><br>
+
+        <label for="week">Week:</label>
+        <input type="week" id="week" name="week"><br>
+        <!-- Other input types as needed -->
+
+        <label for="image">Image:</label>
+        <input type="file" id="image" name="image" accept="image/*"><br>
+
+        <label for="video">Video:</label>
+        <input type="file" id="video" name="video" accept="video/*"><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="displayData"></div>
+
+    <script>
+        document.getElementById('myForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            // Get form data
+            const formData = {};
+            const inputs = this.elements;
+
+            for (let i = 0; i < inputs.length; i++) {
+                const input = inputs[i];
+
+                // Handle file inputs
+                if (input.type === 'file') {
+                    const file = input.files[0];
+                    if (file) {
+                        // Convert file to base64
+                        const reader = new FileReader();
+                        reader.onload = function () {
+                            formData[input.name] = reader.result;
+                            displayFormData(formData);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                } else if (input.type !== 'submit') {
+                    // Handle other input types
+                    formData[input.name] = input.value;
+                }
+            }
+
+            // Store data in localStorage (optional)
+            localStorage.setItem('formData', JSON.stringify(formData));
+
+            // Reset form
+            this.reset();
+        });
+
+        function displayFormData(formData) {
+            const displayDiv = document.getElementById('displayData');
+            displayDiv.innerHTML = '<h3>Submitted Form Data:</h3>';
+
+            for (const [key, value] of Object.entries(formData)) {
+                if (key === 'image') {
+                    // Display image or video
+                    displayDiv.innerHTML += `<p><strong>${key}:</strong><br><img src="${value}" width="200" /><br></p>`;
+                }else  if (key === 'video'){
+                    displayDiv.innerHTML += `<p><strong>${key}:</strong><br><video  width="320" height="240" controls><source src="${value}" type="video/mp4"></video><br></p>`;
+                } 
+                else {
+                    // Display other input types
+                    displayDiv.innerHTML += `<p><strong>${key}:</strong> ${value}</p>`;
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
