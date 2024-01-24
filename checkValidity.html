@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Validation Example</title>
+</head>
+<body>
+
+    <h2>Custom Validation Example</h2>
+
+    <form id="myForm" id novalidate>
+        <label for="text">Text:</label>
+        <input type="text" id="text" name="text" required><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br>
+
+        <label for="number">Number:</label>
+        <input type="number" id="number" name="number" min="18" required><br>
+
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required><br>
+
+        <label for="color">Color:</label>
+        <input type="color" id="color" name="color" required><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" 
+        title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters"><br>
+
+        <label for="checkbox">Checkbox:</label>
+        <input type="checkbox" id="checkbox" name="checkbox" required><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="displayData"></div>
+
+    <script>
+        document.getElementById('myForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            // Get form data
+            const formData = {};
+            const inputs = this.elements;
+
+            for (let i = 0; i < inputs.length; i++) {
+                const input = inputs[i];
+
+                // Handle different input types
+                if (input.type === 'checkbox') {
+                    formData[input.name] = input.checked;
+                } else if (input.checkValidity()) {
+                    formData[input.name] = input.value;
+                } else {
+                    alert(`Invalid ${input.type}: ${input.validationMessage}`);
+                    return; // Stop submission if any field is invalid
+                }
+            }
+
+            // Store form data in localStorage (optional)
+            localStorage.setItem('formData', JSON.stringify(formData));
+
+            // Display form data
+            displayFormData(formData);
+
+            // Reset form
+            this.reset();
+        });
+
+        function displayFormData(formData) {
+            const displayDiv = document.getElementById('displayData');
+            displayDiv.innerHTML = '<h3>Submitted Form Data:</h3>';
+
+            for (const [key, value] of Object.entries(formData)) {
+                displayDiv.innerHTML += `<p><strong>${key}:</strong> ${value}</p>`;
+            }
+        }
+    </script>
+
+</body>
+</html>

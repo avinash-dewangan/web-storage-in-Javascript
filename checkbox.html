@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form with Multiple Checkbox Example</title>
+</head>
+<body>
+
+    <h2>Form with Multiple Checkbox Example</h2>
+
+    <form id="myForm">
+        <label for="text">Text:</label>
+        <input type="text" id="text" name="text" required><br>
+
+        <!-- Other form fields as needed -->
+
+        <label for="checkbox1">
+            <input type="checkbox" id="checkbox1" name="checkbox" value="Option 1"> Option 1
+        </label><br>
+
+        <label for="checkbox2">
+            <input type="checkbox" id="checkbox2" name="checkbox" value="Option 2"> Option 2
+        </label><br>
+
+        <label for="checkbox3">
+            <input type="checkbox" id="checkbox3" name="checkbox" value="Option 3"> Option 3
+        </label><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <div id="displayData"></div>
+
+    <script>
+        document.getElementById('myForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            // Get form data
+            const formData = {};
+            const inputs = this.elements;
+
+            for (let i = 0; i < inputs.length; i++) {
+                const input = inputs[i];
+
+                // Handle checkboxes separately
+                if (input.type === 'checkbox') {
+                    formData[input.name] = formData[input.name] || [];
+                    if (input.checked) {
+                        formData[input.name].push(input.value);
+                    }
+                } else if (input.type !== 'submit') {
+                    // Handle other input types
+                    formData[input.name] = input.value;
+                }
+            }
+
+            // Store form data in localStorage (optional)
+            localStorage.setItem('formData', JSON.stringify(formData));
+
+            // Display form data
+            displayFormData(formData);
+
+            // Reset form
+            this.reset();
+        });
+
+        function displayFormData(formData) {
+            const displayDiv = document.getElementById('displayData');
+            displayDiv.innerHTML = '<h3>Submitted Form Data:</h3>';
+
+            for (const [key, value] of Object.entries(formData)) {
+                if (Array.isArray(value)) {
+                    // Display checkbox values as a list
+                    displayDiv.innerHTML += `<p><strong>${key}:</strong><br>${value.join('<br>')}</p>`;
+                } else {
+                    // Display other input types
+                    displayDiv.innerHTML += `<p><strong>${key}:</strong> ${value}</p>`;
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>

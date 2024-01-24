@@ -1,68 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Input Types Example</title>
+    <style>
+        .error{
+            color: red;
+        }
+    </style>
 </head>
+
 <body>
 
     <h2>All Input Types Example</h2>
-
-    <form id="myForm">
+    <div style="color: red;" id="displayErrorMessage"></div>
+    <form id="myForm" id novalidate>
         <label for="text">Text:</label>
-        <input type="text" id="text" name="text" required><br>
+        <input type="text" id="text" name="text" required>
+        <span class="error"></span>
+        <br>
         <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required><br>
+        <input type="email" id="email" name="email" required>
+        <span class="error"></span>
+        <br>
 
         <label for="number">Number:</label>
-        <input type="number" id="number" name="number" min="18" required><br>
+        <input type="number" id="number" name="number" min="18" required><span class="error"></span>
+        <br>
 
         <label for="date">Date:</label>
-        <input type="date" id="date" name="date" required><br>
+        <input type="date" id="date" name="date" required><span class="error"></span>
+        <br>
 
         <label for="color">Color:</label>
-        <input type="color" id="color" name="color"><br>
+        <input type="color" id="color" name="color" required><span class="error"></span>
+        <br>
 
         <label for="datetime-local">Datetime Local:</label>
-        <input type="datetime-local" id="datetime-local" name="datetime-local"><br>
+        <input type="datetime-local" id="datetime-local" name="datetime-local" required><span class="error"></span>
+        <br>
 
-    
+
 
 
         <label for="month">Month:</label>
-        <input type="month" id="month" name="month"><br>
+        <input type="month" id="month" name="month" required><span class="error"></span>
+        <br>
 
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password"><br>
+        <input type="password" id="password" name="password" required ><span class="error"></span>
+        <br>
 
         <label for="radio">Radio:</label>
-        <input type="radio" id="radio" name="radio" value="radio-value"><br>
+        <input type="radio" id="radio" name="radio" value="radio-value" required> <span class="error"></span>
+        <br>
 
         <label for="range">Range:</label>
-        <input type="range" id="range" name="range"><br>
+        <input type="range" id="range" name="range" required><span class="error"></span>
+        <br>
 
         <label for="search">Search:</label>
-        <input type="search" id="search" name="search"><br>
+        <input type="search" id="search" name="search" required><span class="error"></span>
+        <br>
 
         <label for="tel">Tel:</label>
-        <input type="tel" id="tel" name="tel"><br>
+        <input type="tel" id="tel" name="tel" required><span class="error"></span>
+        <br>
 
         <label for="time">Time:</label>
-        <input type="time" id="time" name="time"><br>
+        <input type="time" id="time" name="time" required><span class="error"></span>
+        <br>
 
         <label for="url">URL:</label>
-        <input type="url" id="url" name="url"><br>
+        <input type="url" id="url" name="url" required><span class="error"></span>
+        <br>
 
         <label for="week">Week:</label>
-        <input type="week" id="week" name="week"><br>
+        <input type="week" id="week" name="week" required><span class="error"></span>
+        <br>
         <!-- Other input types as needed -->
 
         <label for="image">Image:</label>
-        <input type="file" id="image" name="image" accept="image/*"><br>
+        <input type="file" id="image" name="image" accept="image/*"><span class="error"></span>
+        <br>
 
         <label for="video">Video:</label>
-        <input type="file" id="video" name="video" accept="video/*"><br>
+        <input type="file" id="video" name="video" accept="video/*"><span class="error"></span>
+        <br>
+        <label for="checkbox1">
+            <input type="checkbox" id="checkbox1" name="checkbox" value="Option 1"> Option 1
+        </label><span class="error"></span>
+        <br>
+
+        <label for="checkbox2">
+            <input type="checkbox" id="checkbox2" name="checkbox" value="Option 2"> Option 2
+        </label><span class="error"></span>
+        <br>
+
+        <label for="checkbox3">
+            <input type="checkbox" id="checkbox3" name="checkbox" value="Option 3"> Option 3
+        </label><span class="error"></span>
+        <br>
+
 
         <button type="submit">Submit</button>
     </form>
@@ -77,11 +118,39 @@
             const formData = {};
             const inputs = this.elements;
 
+
+            let error = [];
+
             for (let i = 0; i < inputs.length; i++) {
                 const input = inputs[i];
 
+                if (!input.checkValidity()) {
+                    error.push(`Invalid ${input.type}: ${input.validationMessage}`);
+                    input.nextElementSibling.innerText=`Invalid ${input.type}: ${input.validationMessage}`
+                }
+            }
+            if (error.length > 0) {
+
+                let ee = error.map((e, i) => {
+                    return `<li>${e}</li>`
+                }).join("")
+                const displayDiv = document.getElementById('displayErrorMessage');
+                displayDiv.innerHTML = `<ul>${ee}</ul>`;
+                return
+            }
+
+            for (let i = 0; i < inputs.length; i++) {
+                const input = inputs[i];
+
+                // Handle checkboxes separately
+                if (input.type === 'checkbox') {
+                    formData[input.name] = formData[input.name] || [];
+                    if (input.checked) {
+                        formData[input.name].push(input.value);
+                    }
+                }
                 // Handle file inputs
-                if (input.type === 'file') {
+                else if (input.type === 'file') {
                     const file = input.files[0];
                     if (file) {
                         // Convert file to base64
@@ -110,12 +179,16 @@
             displayDiv.innerHTML = '<h3>Submitted Form Data:</h3>';
 
             for (const [key, value] of Object.entries(formData)) {
-                if (key === 'image') {
+                if (Array.isArray(value)) {
+                    // Display checkbox values as a list
+                    displayDiv.innerHTML += `<p><strong>${key}:</strong><br>${value.join('<br>')}</p>`;
+                }
+                else if (key === 'image') {
                     // Display image or video
                     displayDiv.innerHTML += `<p><strong>${key}:</strong><br><img src="${value}" width="200" /><br></p>`;
-                }else  if (key === 'video'){
+                } else if (key === 'video') {
                     displayDiv.innerHTML += `<p><strong>${key}:</strong><br><video  width="320" height="240" controls><source src="${value}" type="video/mp4"></video><br></p>`;
-                } 
+                }
                 else {
                     // Display other input types
                     displayDiv.innerHTML += `<p><strong>${key}:</strong> ${value}</p>`;
@@ -125,4 +198,5 @@
     </script>
 
 </body>
+
 </html>
